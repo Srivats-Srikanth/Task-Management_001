@@ -1,5 +1,6 @@
 package com.api.task.error.handler;
 
+import com.api.task.error.BadRequestException;
 import com.api.task.error.ErrorResponse;
 import com.api.task.error.NoTaskFoundException;
 import org.springframework.http.HttpStatus;
@@ -24,5 +25,10 @@ public class TaskExceptionHandlerService {
     @ExceptionHandler(NoTaskFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoTaskFoundException(Exception ex) {
         return new ResponseEntity<>(new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequestException(Exception ex) {
+        return new ResponseEntity<>(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }

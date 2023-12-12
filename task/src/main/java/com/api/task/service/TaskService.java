@@ -1,16 +1,21 @@
 package com.api.task.service;
 
+import com.api.task.constants.Constants;
 import com.api.task.entity.Progress;
 import com.api.task.entity.Task;
 import com.api.task.entity.User;
 import com.api.task.entity.custom.CustomTaskCount;
+import com.api.task.error.BadRequestException;
 import com.api.task.error.NoTaskFoundException;
 import com.api.task.reposoitory.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.PriorityQueue;
 import java.util.stream.Stream;
 
 @Service
@@ -21,11 +26,14 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
-    private PriorityQueue<Task> taskQueue = new PriorityQueue<>();
+    private final PriorityQueue<Task> taskQueue = new PriorityQueue<>();
 
-    public Task createTask(Task task) {
-        taskQueue.add(task);
-        return taskRepository.save(task);
+    public Task createTask(Task taskRequest) {
+        return Optional.ofNullable(taskRequest).map(task -> {
+            taskQueue.add(task);
+            task.setStatus(Constants.STATUS.UNASSIGNED.getStatusValue());
+            return taskRepository.save(task);
+        }).orElseThrow(() -> new BadRequestException("Task Request Object cannot be null"));
     }
 
     public Task updateTask(Task task, Long taskId) {
